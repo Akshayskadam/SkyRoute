@@ -209,10 +209,10 @@ Ensure the backend is running and the frontend is configured to communicate with
 
 ## 🔄 Application Workflow
 
-```text
+
 <img width="2400" height="1792" alt="Gemini_Generated_Image_pvkyvzpvkyvzpvky" src="https://github.com/user-attachments/assets/2f35c4c2-7f09-4862-b208-76c6843889fd" />
 
-```
+
 
 ---
 
