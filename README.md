@@ -210,35 +210,8 @@ Ensure the backend is running and the frontend is configured to communicate with
 ## 🔄 Application Workflow
 
 ```text
-             USER
-               |
-               v
-       Angular Frontend
-               |
-               v
-       Express Backend
-               |
-        +------+------+
-        |             |
-        v             v
-    Open-Meteo       OSRM
-    Weather API    Routing API
-        |             |
-        +------+------+
-               |
-               v
-       Process API Data
-               |
-               v
-       Display Results
-               |
-        +------+------+
-        |             |
-        v             v
-   Weather Data   Route Map
-        |
-        v
-    Travel Insights
+<img width="2400" height="1792" alt="Gemini_Generated_Image_pvkyvzpvkyvzpvky" src="https://github.com/user-attachments/assets/e0d2e261-4ca8-4c6b-9c00-aea2a224c151" />
+
 ```
 
 ---
