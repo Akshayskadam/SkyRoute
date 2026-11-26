@@ -1,0 +1,617 @@
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">S</div>
+      <div>
+        <h2>SkyRoute</h2>
+        <span>TRAVEL INTELLIGENCE</span>
+      </div>
+    </div>
+
+    <div class="nav-heading">WORKSPACE</div>
+
+    <nav class="navigation">
+      @for (item of navItems; track item.label) {
+        <a
+  class="nav-item"
+  [class.active]="item.active"
+(click)="navigateTo(item.label)"
+
+
+>
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+          @if (item.active) {
+            <span class="active-indicator"></span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="nav-heading">PREFERENCES</div>
+      <a class="nav-item">
+        <span class="nav-icon">⚙</span>
+        <span>Settings</span>
+      </a>
+
+      <div class="upgrade-card">
+        <div class="upgrade-icon">✦</div>
+        <h3>Travel smarter</h3>
+        <p>Make every journey more informed with weather intelligence.</p>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="avatar">AK</div>
+        <div>
+          <strong>Akshay Kadam</strong>
+          <span>Personal workspace</span>
+        </div>
+        <span class="more-icon">···</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+@if (showSavedTrips()) {
+  <section class="saved-trips-page">
+    <h1>Saved Trips</h1>
+    <p>Your saved journeys are listed below.</p>
+
+    @if (savedTrips().length === 0) {
+      <p>No saved trips yet. Click Save Trip in Route Overview.</p>
+    }
+
+    @for (trip of savedTrips(); track trip.id) {
+      <article class="panel">
+        <h3>{{ trip.origin }} → {{ trip.destination }}</h3>
+        <p>Distance: {{ trip.distance }}</p>
+        <p>Duration: {{ trip.duration }}</p>
+        <p>Saved on: {{ trip.savedAt }}</p>
+
+        <button
+          type="button"
+          class="text-button"
+          (click)="editTrip(trip)"
+        >
+          Edit Trip
+        </button>
+
+        <button
+          type="button"
+          class="text-button"
+          (click)="deleteTrip(trip.id)"
+        >
+          Delete Trip
+        </button>
+      </article>
+    }
+
+    @if (editingTrip()) {
+      <div class="panel">
+        <h2>Edit Trip</h2>
+
+        <label>Origin</label>
+       <input
+  type="text"
+  [value]="editingTrip()!.origin"
+  (input)="updateTripOrigin($any($event.target).value)"
+/>
+
+        <label>Destination</label>
+        <input
+  type="text"
+  [value]="editingTrip()!.destination"
+  (input)="updateTripDestination($any($event.target).value)"
+/>
+
+        <p>Distance: {{ editingTrip()!.distance }}</p>
+        <p>Duration: {{ editingTrip()!.duration }}</p>
+        <button
+  type="button"
+  class="text-button"
+  (click)="saveTripChanges()"
+>
+  Save Changes
+</button>
+
+<button
+  type="button"
+  class="text-button"
+  (click)="editingTrip.set(null)"
+>
+  Cancel
+</button>
+
+      </div>
+    }
+  </section>
+
+  
+} @else if (showRoutePlanner()) {
+   
+
+  <!-- ROUTE PLANNER PAGE -->
+  <header class="topbar">
+    <div class="breadcrumb">
+      <span>Workspace</span>
+      <span class="breadcrumb-divider">/</span>
+      <strong>Route Planner</strong>
+    </div>
+  </header>
+
+  <section class="page-intro">
+    <div>
+      <div class="eyebrow">TRAVEL PLANNING</div>
+      <h1>Plan Your Journey</h1>
+      <p>Choose your starting point and destination.</p>
+    </div>
+  </section>
+
+  <section class="panel route-planner">
+    <div class="panel-heading">
+      <div>
+        <div class="section-label">PLAN YOUR JOURNEY</div>
+        <h2>Route Planner</h2>
+        <p>Enter your starting point and destination.</p>
+      </div>
+    </div>
+
+    <div class="route-inputs">
+
+      <div class="form-group">
+        <label for="origin">Origin</label>
+        <input
+          id="origin"
+          type="text"
+          [value]="routeOrigin()"
+          (input)="routeOrigin.set($any($event.target).value)"
+        />
+      </div>
+      <div class="form-group">
+        <label for="destination">Destination</label>
+        <input
+          id="destination"
+          type="text"
+          [value]="routeDestination()"
+          (input)="routeDestination.set($any($event.target).value)"
+        />
+      </div>
+
+        <button
+      type="button"
+      class="primary-button"
+      (click)="calculateEnteredRoute()"
+      [disabled]="isLoadingRoute()"
+    >
+      {{ isLoadingRoute() ? 'Calculating...' : 'Calculate Route' }}
+    </button>
+
+  </div>
+
+  <!-- ROUTE CALCULATION RESULTS -->
+  @if (isLoadingRoute()) {
+    <p class="route-message">Calculating your route...</p>
+  }
+
+  @if (routeError()) {
+    <p class="route-error">{{ routeError() }}</p>
+  }
+
+  @if (!isLoadingRoute() && !routeError() && routeDistance() !== 'Calculating...') {
+    <div class="route-details">
+      <div>
+        <span class="detail-label">DISTANCE</span>
+        <strong>{{ routeDistance() }}</strong>
+      </div>
+
+      <div>
+        <span class="detail-label">ESTIMATED DURATION</span>
+        <strong>{{ routeDuration() }}</strong>
+      </div>
+    </div>
+  }
+
+</section>
+
+} @else {
+  <!-- HEADER -->
+<header class="topbar">
+
+  <div class="breadcrumb">
+    <span>Workspace</span>
+    <span class="breadcrumb-divider">/</span>
+    <strong>Overview</strong>
+  </div>
+
+  <div class="topbar-actions">
+
+    @if (searchError()) {
+      <div class="search-error">
+        {{ searchError() }}
+      </div>
+    }
+
+    <button class="icon-button">♧</button>
+
+    <div class="top-avatar">AK</div>
+
+  </div>
+
+</header>
+
+    <!-- PAGE INTRO -->
+    <section class="page-intro">
+      <div>
+        <div class="eyebrow">TUESDAY, NOVEMBER 11, 2026</div>
+        <h1>Good afternoon, Akshay <span>✦</span></h1>
+        <p>Here's your travel and weather intelligence overview.</p>
+      </div>
+
+      <button class="primary-button">
+        <span>＋</span> Plan a new trip
+      </button>
+    </section>
+    <!-- DYNAMIC ROUTE PLANNER -->
+    <section class="panel route-planner">
+
+      <div class="panel-heading">
+        <div>
+          <div class="section-label">PLAN YOUR JOURNEY</div>
+          <h2>Route Planner</h2>
+          <p>Enter your starting point and destination.</p>
+        </div>
+      </div>
+
+      <div class="route-inputs">
+
+        <div class="form-group">
+          <label for="origin">Origin</label>
+          <input
+            id="origin"
+            type="text"
+            placeholder="Enter starting city"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="destination">Destination</label>
+          <input
+            id="destination"
+            type="text"
+            placeholder="Enter destination city"
+          />
+        </div>
+
+     <button
+  type="button"
+  class="primary-button"
+  (click)="calculateEnteredRoute()"
+  [disabled]="isLoadingRoute()"
+>
+  {{ isLoadingRoute() ? 'Calculating...' : 'Calculate Route' }}
+</button>
+
+      </div>
+    </section>
+    <!-- WEATHER LOCATION -->
+    <section class="location-strip">
+      <div class="location-info">
+        <span class="location-pin">⌖</span>
+        <div>
+          <strong>{{ selectedCity() }}</strong>
+         <span>
+  {{ isLoadingWeather() ? 'Updating weather...' : 'Current weather overview' }}
+</span>
+        </div>
+      </div>
+      <div class="live-status">
+        <span class="live-dot"></span>
+{{ backendStatus() }}
+      </div>
+    </section>
+
+    <!-- WEATHER CARDS -->
+    <section class="weather-grid">
+      @for (stat of weatherStats(); track stat.label) {
+        <article class="weather-card">
+          <div class="card-top">
+            <span>{{ stat.label }}</span>
+            <div class="weather-icon" [class]="stat.color">{{ stat.icon }}</div>
+          </div>
+          <h2>{{ stat.value }}</h2>
+          <p>{{ stat.detail }}</p>
+        </article>
+      }
+    </section>
+
+    <!-- MAIN GRID -->
+    <section class="content-grid">
+
+      <!-- ROUTE OVERVIEW -->
+      <article class="panel route-panel">
+   <div class="panel-heading">
+  <div>
+    <div class="section-label">YOUR JOURNEY</div>
+    <h2>Route overview</h2>
+  </div>
+
+  <button
+    class="text-button"
+    type="button"
+    (click)="saveTrip()"
+  >
+    ♡ Save Trip
+  </button>
+</div>
+
+        <div class="route-summary">
+          <div class="route-city">
+            <span class="city-dot origin"></span>
+            <div>
+             <strong>{{ routeOrigin() }}</strong>
+              <span>Origin</span>
+            </div>
+          </div>
+
+          <div class="route-line">
+            <span>↗</span>
+            <div></div>
+            <small>{{ routeDistance() }}</small>
+          </div>
+
+          <div class="route-city">
+            <span class="city-dot destination"></span>
+            <div>
+              <strong>{{ routeDestination() }}</strong>
+              <span>Destination</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAP PLACEHOLDER -->
+      <!-- INTERACTIVE LEAFLET MAP -->
+<div #routeMap class="route-map"></div>
+
+    
+<div class="route-details">
+  <div>
+    <span class="detail-label">ESTIMATED DURATION</span>
+    <strong>{{ routeDuration() }}</strong>
+  </div>
+<button
+  type="button"
+  class="text-button"
+  (click)="saveTrip()"
+>
+  ♡ Save Trip
+</button>
+  <div>
+    <span class="detail-label">DISTANCE</span>
+    <strong>{{ routeDistance() }}</strong>
+  </div>
+
+  <div>
+  <span class="detail-label">WEATHER STATUS</span>
+
+ <strong
+  class="safe-status"
+  style="display: inline-flex; flex-direction: row; align-items: center; gap: 8px;"
+  [class.cloudy-status]="routeWeatherStatus() === 'Cloudy'"
+  [class.overcast-status]="routeWeatherStatus() === 'Overcast'"
+  [class.partly-cloudy-status]="routeWeatherStatus() === 'Partly cloudy'"
+  [class.rain-warning]="routeWeatherStatus() === 'Rain expected'"
+  [class.wind-warning]="routeWeatherStatus() === 'Strong winds'"
+  [class.heavy-rain]="routeWeatherStatus() === 'Heavy rain risk'"
+>
+  <span class="weather-status-icon">
+    @if (routeWeatherStatus() === 'Mostly clear') {
+      ☀️
+    } @else if (routeWeatherStatus() === 'Cloudy' || routeWeatherStatus() === 'Overcast') {
+      ☁️
+    } @else if (routeWeatherStatus() === 'Partly cloudy') {
+      ⛅
+    } @else if (routeWeatherStatus() === 'Rain expected') {
+      🌧️
+    } @else if (routeWeatherStatus() === 'Strong winds') {
+      💨
+    } @else if (routeWeatherStatus() === 'Heavy rain risk') {
+      ⛈️
+    }
+  </span>
+
+  {{ routeWeatherStatus() }}
+</strong>
+</div>
+</div>
+
+@if (isLoadingRoute()) {
+  <p class="route-message">Calculating route...</p>
+}
+
+@if (routeError()) {
+  <p class="route-error">{{ routeError() }}</p>
+}
+
+      
+
+<div class="route-timeline">
+  <div class="timeline-heading">
+    <strong>Weather along your route</strong>
+    <span>{{ routeWeather().length }} checkpoints</span>
+  </div>
+
+  @if (isLoadingRouteWeather()) {
+    <p class="route-message">Loading checkpoint weather...</p>
+  }
+
+  @if (routeWeatherError()) {
+    <p class="route-error">{{ routeWeatherError() }}</p>
+  }
+
+  @for (point of routeWeather(); track point.name) {
+    <div class="timeline-item">
+      <span class="timeline-dot clear"></span>
+
+      <div class="timeline-text">
+        <strong>{{ point.name }}</strong>
+        <span>
+          {{ point.temperature }}°C · Humidity {{ point.humidity }}%
+        </span>
+      </div>
+
+      <span class="checkpoint-status clear">
+        {{ point.precipitation }} mm rain
+      </span>
+    </div>
+  }
+</div>
+
+      </article>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-column">
+
+        <!-- FORECAST -->
+        <article class="panel forecast-panel">
+          <div class="panel-heading">
+            <div>
+              <div class="section-label">WEATHER CONDITIONS</div>
+              <h2>Today's forecast</h2>
+            </div>
+            <span class="unit-label">HOURLY</span>
+          </div>
+
+          <div class="forecast-list">
+            @for (item of forecast(); track item.time) {
+              <div class="forecast-item">
+                <span class="forecast-time">{{ item.time }}</span>
+                <span class="forecast-icon">{{ item.icon }}</span>
+                <strong>{{ item.temp }}</strong>
+                <span class="rain-value">{{ item.rain }} rain</span>
+              </div>
+            }
+          </div>
+        </article>
+
+      <!-- TRAVEL INSIGHT -->
+<article class="panel insight-panel">
+  <div class="insight-heading">
+    <span class="insight-symbol">✦</span>
+    <span>SKYROUTE INSIGHT</span>
+  </div>
+
+  <h3>{{ travelInsight().title }}</h3>
+
+  <p>{{ travelInsight().message }}</p>
+
+  <div class="insight-footer">
+    <span
+      class="insight-dot"
+      [class.warning]="travelInsight().status === 'warning'"
+      [class.good]="travelInsight().status === 'good'"
+    ></span>
+
+    @if (travelInsight().status === 'loading') {
+      Analysing weather...
+    } @else if (travelInsight().status === 'warning') {
+      Weather advisory
+    } @else {
+      Live weather recommendation
+    }
+  </div>
+</article>
+      </div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="analytics-grid">
+
+      <article class="panel chart-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="section-label">TEMPERATURE ANALYSIS</div>
+            <h2>Temperature trends</h2>
+          </div>
+          <span class="chart-period">TODAY</span>
+        </div>
+
+        <div class="chart-area">
+          <div class="chart-y-labels">
+            <span>35°</span>
+            <span>30°</span>
+            <span>25°</span>
+            <span>20°</span>
+          </div>
+          <div class="temperature-chart">
+            <div class="chart-guides">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <svg viewBox="0 0 600 180" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="temperatureFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity=".25"/>
+                  <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+          <polygon
+  [attr.points]="temperatureChartFillPoints()"
+  fill="url(#temperatureFill)"
+/>
+
+<polyline
+  [attr.points]="temperatureChartPoints()"
+  fill="none"
+  stroke="#38bdf8"
+  stroke-width="3"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+/>
+            </svg>
+         <div class="chart-x-labels">
+  @for (time of temperatureChartLabels(); track $index) {
+    <span>{{ time }}</span>
+  }
+</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel rainfall-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="section-label">PRECIPITATION</div>
+            <h2>Rain probability</h2>
+          </div>
+          <span class="chart-period">TODAY</span>
+        </div>
+
+        <div class="rainfall-summary">
+         <strong>{{ averageRainProbability() }}%</strong>
+<span>Average probability</span>
+        </div>
+
+       <div class="rain-bars">
+  @for (item of rainfallChart(); track $index) {
+    <div class="rain-bar-item">
+      <div class="rain-bar">
+        <span [style.height]="item.probability + '%'"></span>
+      </div>
+      <small>{{ item.time }}</small>
+    </div>
+  }
+</div>
+      </article>
+    </section>
+
+    <footer class="dashboard-footer">
+      <span>SKYROUTE · TRAVEL INTELLIGENCE PLATFORM</span>
+      <span>Dashboard preview · Sample data only</span>
+    </footer>
+  }
+  </main>
+</div>
