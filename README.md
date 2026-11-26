@@ -119,34 +119,8 @@ SkyRoute follows a frontend-backend architecture.
 
 ## 🏗️ Project Architecture
 
-```text
-SkyRoute/
-│
-├── backend/
-│   ├── package.json
-│   ├── package-lock.json
-│   └── server.js
-│
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── app.ts
-│   │   │   ├── app.html
-│   │   │   ├── app.scss
-│   │   │   ├── app.config.ts
-│   │   │   └── app.routes.ts
-│   │   ├── index.html
-│   │   ├── main.ts
-│   │   └── styles.scss
-│   ├── angular.json
-│   └── package.json
-│
-├── docs/
-│   └── screenshots/
-│
-└── .gitignore
-```
+<img width="2400" height="1792" alt="Gemini_Generated_Image_pvkyvzpvkyvzpvky" src="https://github.com/user-attachments/assets/14032295-cb8f-4a77-9789-e38a61b25d09" />
+
 
 ---
 
